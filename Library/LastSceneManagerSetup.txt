@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/_Scripts/PureMVCExample/_Scenes/Scene1.unity
-  isLoaded: 1
-  isActive: 1
