@@ -5,3 +5,5 @@
 *.ide-shm
 *.ide
 *.cache
+*.lock
+Temp/UnityLockfile
