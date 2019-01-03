@@ -22,24 +22,21 @@ namespace PureMVC.Interfaces
     /// </remarks>
 	/// <see cref="PureMVC.Interfaces.IView"/>
 	/// <see cref="PureMVC.Interfaces.IObserver"/>
-    public interface INotification
+    public interface INotification<SendEntity, Param>
     {
         /// <summary>
         /// The name of the <c>INotification</c> instance
         /// </summary>
-        /// <remarks>No setter, should be set by constructor only</remarks>
-		string Name { get; }
+        NotifyDefine NotifiId { get; set; }
 
+        /// <summary>
+        /// 发送消息的实体
+        /// </summary>
+        SendEntity Send { get; set; }
         /// <summary>
         /// The body of the <c>INotification</c> instance
         /// </summary>
-		object Body { get; set; }
-		
-        /// <summary>
-        /// The type of the <c>INotification</c> instance
-        /// </summary>
-		string Type { get; set; }
-
+		Param Body { get; set; }
         /// <summary>
         /// Get the string representation of the <c>INotification</c> instance
         /// </summary>

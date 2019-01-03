@@ -135,14 +135,6 @@ namespace PureMVC.Core
 		{
 			get
 			{
-				if (m_instance == null)
-				{
-					lock (m_staticSyncRoot)
-					{
-						if (m_instance == null) m_instance = new Model();
-					}
-				}
-
 				return m_instance;
 			}
 		}
@@ -156,7 +148,14 @@ namespace PureMVC.Core
 		/// </summary>
 		static Model()
 		{
-		}
+            if (m_instance == null)
+            {
+                lock (m_staticSyncRoot)
+                {
+                    if (m_instance == null) m_instance = new Model();
+                }
+            }
+        }
 
 		/// <summary>
 		/// Initialize the Singleton <c>Model</c> instance.

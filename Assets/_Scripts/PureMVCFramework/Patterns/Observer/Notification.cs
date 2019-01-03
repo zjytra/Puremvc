@@ -23,26 +23,33 @@ namespace PureMVC.Patterns
     ///     <para>Notifications are not meant to be a replacement for Events. Generally, <c>IMediator</c> implementors place event handlers on their view components, which they then handle in the usual way. This may lead to the broadcast of <c>Notification</c>s to trigger <c>ICommand</c>s or to communicate with other <c>IMediators</c>. <c>IProxy</c> and <c>ICommand</c> instances communicate with each other and <c>IMediator</c>s by broadcasting <c>INotification</c>s</para>
     /// </remarks>
 	/// <see cref="PureMVC.Patterns.Observer"/>
-    public class Notification : INotification
-	{
+    public class Notification<SendEntity, Param> : ObjectPool<Notification<SendEntity, Param>>, INotification<SendEntity, Param> 
+    {
 		#region Constructors
 
+        public Notification()
+        {
+
+        }
 		/// <summary>
         /// Constructs a new notification with the specified name, default body and type
         /// </summary>
         /// <param name="name">The name of the <c>Notification</c> instance</param>
-        public Notification(string name)
-            : this(name, null, null)
-		{ }
+        public Notification(NotifyDefine notifi)
+		{
+            m_notifi = notifi;
+        }
 
         /// <summary>
         /// Constructs a new notification with the specified name and body, with the default type
         /// </summary>
         /// <param name="name">The name of the <c>Notification</c> instance</param>
         /// <param name="body">The <c>Notification</c>s body</param>
-        public Notification(string name, object body)
-            : this(name, body, null)
-		{ }
+        public Notification(NotifyDefine notifi,  Param body)
+            :this(notifi)
+		{
+            m_body = body;
+        }
 
         /// <summary>
         /// Constructs a new notification with the specified name, body and type
@@ -50,11 +57,10 @@ namespace PureMVC.Patterns
         /// <param name="name">The name of the <c>Notification</c> instance</param>
         /// <param name="body">The <c>Notification</c>s body</param>
         /// <param name="type">The type of the <c>Notification</c></param>
-        public Notification(string name, object body, string type)
+        public Notification(NotifyDefine notifi , SendEntity send,  Param body)
+           :this(notifi,body)
 		{
-			m_name = name;
-			m_body = body;
-			m_type = type;
+			m_send = send;
 		}
 
 		#endregion
@@ -67,11 +73,17 @@ namespace PureMVC.Patterns
 		/// <returns>The string representation of the <c>Notification</c> instance</returns>
 		public override string ToString()
 		{
-			string msg = "Notification Name: " + Name;
+			string msg = "Notification Name: " + NotifiId;
 			msg += "\nBody:" + ((Body == null) ? "null" : Body.ToString());
-			msg += "\nType:" + ((Type == null) ? "null" : Type);
+			msg += "\nSend:" + ((Send == null) ? "null" : Send.ToString());
 			return msg;
 		}
+
+        public void  RecycleObj()
+        {
+            m_notifi = 0;
+            reclaimObject(this);
+        }
 
 		#endregion
 
@@ -80,16 +92,17 @@ namespace PureMVC.Patterns
 		/// <summary>
         /// The name of the <c>Notification</c> instance
         /// </summary>
-		public virtual string Name
+		public virtual NotifyDefine NotifiId
 		{
-			get { return m_name; }
+			get { return m_notifi; }
+            set { m_notifi = value; }
 		}
 		
         /// <summary>
         /// The body of the <c>Notification</c> instance
         /// </summary>
 		/// <remarks>This accessor is thread safe</remarks>
-		public virtual object Body
+		public virtual Param Body
 		{
 			get
 			{
@@ -98,47 +111,38 @@ namespace PureMVC.Patterns
 			}
 			set
 			{
-				// Setting and getting of reference types is atomic, no need to lock here
 				m_body = value;
 			}
 		}
-		
-		/// <summary>
-		/// The type of the <c>Notification</c> instance
-		/// </summary>
-		/// <remarks>This accessor is thread safe</remarks>
-		public virtual string Type
+
+
+
+        public SendEntity Send
         {
-			get
-			{
-				// Setting and getting of reference types is atomic, no need to lock here
-				return m_type;
-			}
-			set
-			{
-				// Setting and getting of reference types is atomic, no need to lock here
-				m_type = value;
-			}
-		}
+            get
+            {
+                return m_send;
+            }
 
-		#endregion
+            set
+            {
+                m_send = value;
+            }
+        }
 
-		#region Members
+        public NotifyDefine Notifyid
+        {
+            get
+            {
+                return m_notifi;
+            }
+        }
 
-		/// <summary>
-        /// The name of the notification instance 
-        /// </summary>
-		private string m_name;
-
-        /// <summary>
-        /// The type of the notification instance
-        /// </summary>
-		private string m_type;
-
-        /// <summary>
-        /// The body of the notification instance
-        /// </summary>
-		private object m_body;
+        private NotifyDefine m_notifi;
+        //发送者
+        private SendEntity m_send;
+        //参数
+		private Param m_body;
 
 		#endregion
 	}

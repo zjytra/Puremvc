@@ -137,11 +137,34 @@ namespace PureMVC.Patterns
 	/// <see cref="PureMVC.Patterns.Proxy"/>
 	/// <see cref="PureMVC.Patterns.SimpleCommand"/>
 	/// <see cref="PureMVC.Patterns.MacroCommand"/>
-    public class Facade : IFacade
+    public class Facade : IFacade,IController,INotifier
 	{
-		#region Constructors
-
-		/// <summary>
+        /// <summary>
+        /// Private reference to the Controller
+        /// </summary>
+        protected IController m_controller;
+        /// <summary>
+        /// Private reference to the Model
+        /// </summary>
+        protected IModel m_model;
+        /// <summary>
+        /// Private reference to the View
+        /// </summary>
+        protected IView m_view;
+        /// <summary>
+        /// 通知接口
+        /// </summary>
+        protected INotifier m_notifier;
+        /// <summary>
+        /// The Singleton Facade Instance
+        /// </summary>
+        protected static volatile Facade m_instance;
+        /// <summary>
+        /// Used for locking the instance calls
+        /// </summary>
+        protected static readonly object m_staticSyncRoot = new object();
+        #region Constructors
+        /// <summary>
         /// Constructor that initializes the Facade
         /// </summary>
         /// <remarks>
@@ -151,14 +174,8 @@ namespace PureMVC.Patterns
         {
 			InitializeFacade();
 		}
-
 		#endregion
 
-		#region Public Methods
-
-		#region IFacade Members
-
-		#region Proxy
 
 		/// <summary>
 		/// Register an <c>IProxy</c> with the <c>Model</c> by name
@@ -210,51 +227,6 @@ namespace PureMVC.Patterns
 			return m_model.HasProxy(proxyName);
 		}
 
-		#endregion
-
-		#region Command
-
-		/// <summary>
-		/// Register an <c>ICommand</c> with the <c>Controller</c>
-		/// </summary>
-		/// <param name="notificationName">The name of the <c>INotification</c> to associate the <c>ICommand</c> with.</param>
-		/// <param name="commandType">A reference to the <c>Type</c> of the <c>ICommand</c></param>
-		/// <remarks>This method is thread safe and needs to be thread safe in all implementations.</remarks>
-        public virtual void RegisterCommand(string notificationName, Type commandType)
-		{
-			// The controller is initialized in the constructor of the singleton, so this call should be thread safe.
-			// This method is thread safe on the controller.
-			m_controller.RegisterCommand(notificationName, commandType);
-		}
-
-		/// <summary>
-		/// Remove a previously registered <c>ICommand</c> to <c>INotification</c> mapping from the Controller.
-		/// </summary>
-		/// <param name="notificationName">TRemove a previously registered <c>ICommand</c> to <c>INotification</c> mapping from the Controller.</param>
-		/// <remarks>This method is thread safe and needs to be thread safe in all implementations.</remarks>
-        public virtual void RemoveCommand(string notificationName)
-		{
-			// The controller is initialized in the constructor of the singleton, so this call should be thread safe.
-			// This method is thread safe on the controller.
-			m_controller.RemoveCommand(notificationName);
-		}
-
-		/// <summary>
-		/// Check if a Command is registered for a given Notification 
-		/// </summary>
-		/// <param name="notificationName">The name of the <c>INotification</c> to check for.</param>
-		/// <returns>whether a Command is currently registered for the given <c>notificationName</c>.</returns>
-		/// <remarks>This method is thread safe and needs to be thread safe in all implementations.</remarks>
-        public virtual bool HasCommand(string notificationName)
-		{
-			// The controller is initialized in the constructor of the singleton, so this call should be thread safe.
-			// This method is thread safe on the controller.
-			return m_controller.HasCommand(notificationName);
-		}
-
-		#endregion
-
-		#region Mediator
 
 		/// <summary>
 		/// Register an <c>IMediator</c> instance with the <c>View</c>
@@ -306,94 +278,26 @@ namespace PureMVC.Patterns
 			return m_view.HasMediator(mediatorName);
 		}
 
-		#endregion
-
-		#region Observer
-
-		/// <summary>
-		/// Notify <c>Observer</c>s of an <c>INotification</c>
-		/// </summary>
-		/// <remarks>This method is left public mostly for backward compatibility, and to allow you to send custom notification classes using the facade.</remarks>
-		/// <remarks>Usually you should just call sendNotification and pass the parameters, never having to construct the notification yourself.</remarks>
-		/// <param name="notification">The <c>INotification</c> to have the <c>View</c> notify observers of</param>
-		/// <remarks>This method is thread safe and needs to be thread safe in all implementations.</remarks>
-        public virtual void NotifyObservers(INotification notification)
-		{
-			// The view is initialized in the constructor of the singleton, so this call should be thread safe.
-			// This method is thread safe on the view.
-			m_view.NotifyObservers(notification);
-		}
-
-		#endregion
-
-		#endregion
-
-		#region INotifier Members
-
-		/// <summary>
-		/// Send an <c>INotification</c>
-		/// </summary>
-		/// <param name="notificationName">The name of the notiification to send</param>
-		/// <remarks>Keeps us from having to construct new notification instances in our implementation code</remarks>
-		/// <remarks>This method is thread safe and needs to be thread safe in all implementations.</remarks>
-        public virtual void SendNotification(string notificationName)
-		{
-			NotifyObservers(new Notification(notificationName));
-		}
-
-		/// <summary>
-		/// Send an <c>INotification</c>
-		/// </summary>
-		/// <param name="notificationName">The name of the notification to send</param>
-		/// <param name="body">The body of the notification</param>
-		/// <remarks>Keeps us from having to construct new notification instances in our implementation code</remarks>
-		/// <remarks>This method is thread safe and needs to be thread safe in all implementations.</remarks>
-        public virtual void SendNotification(string notificationName, object body)
-		{
-			NotifyObservers(new Notification(notificationName, body));
-		}
-
-		/// <summary>
-		/// Send an <c>INotification</c>
-		/// </summary>
-		/// <param name="notificationName">The name of the notification to send</param>
-		/// <param name="body">The body of the notification</param>
-		/// <param name="type">The type of the notification</param>
-		/// <remarks>Keeps us from having to construct new notification instances in our implementation code</remarks>
-		/// <remarks>This method is thread safe and needs to be thread safe in all implementations.</remarks>
-        public virtual void SendNotification(string notificationName, object body, string type)
-		{
-			NotifyObservers(new Notification(notificationName, body, type));
-		}
-
-		#endregion
-
-		#endregion
-
-		#region Accessors
 
 		/// <summary>
 		/// Facade Singleton Factory method.  This method is thread safe.
 		/// </summary>
-		public static IFacade Instance
+		public static Facade Instance
 		{
 			get
 			{
-				if (m_instance == null)
-				{
-					lock (m_staticSyncRoot)
-					{
-						if (m_instance == null) m_instance = new Facade();
-					}
-				}
-
-				return m_instance;
+                if (m_instance == null)
+                {
+                    lock (m_staticSyncRoot)
+                    {
+                        if (m_instance == null) m_instance = new Facade();
+                    }
+                }
+                return m_instance;
 			}
 		}
 
-		#endregion
 
-		#region Protected & Internal Methods
 
 		/// <summary>
         /// Explicit static constructor to tell C# compiler 
@@ -401,7 +305,9 @@ namespace PureMVC.Patterns
         ///</summary>
         static Facade()
         {
+           
         }
+
 
         /// <summary>
         /// Initialize the Singleton <c>Facade</c> instance
@@ -411,7 +317,18 @@ namespace PureMVC.Patterns
         /// </remarks>
         protected virtual void InitializeFacade()
         {
-			InitializeModel();
+            
+            if (m_model == null)
+                m_model = Model.Instance;
+            if (m_controller == null)
+                m_controller = Controller.Instance;
+            if (m_view == null) 
+                m_view = View.Instance;
+            if (m_notifier == null)
+                m_notifier = Notifier.Instance;
+
+
+            InitializeModel();
 			InitializeController();
 			InitializeView();
 		}
@@ -429,76 +346,20 @@ namespace PureMVC.Patterns
         /// </remarks>
 		protected virtual void InitializeController()
         {
-			if (m_controller != null) return;
-			m_controller = Controller.Instance;
+		
 		}
-
-        /// <summary>
-        /// Initialize the <c>Model</c>
-        /// </summary>
-        /// <remarks>
-        ///     <para>Called by the <c>initializeFacade</c> method. Override this method in your subclass of <c>Facade</c> if one or both of the following are true:</para>
-        ///     <list type="bullet">
-        ///         <item>You wish to initialize a different <c>IModel</c></item>
-        ///         <item>You have <c>Proxy</c>s to register with the Model that do not retrieve a reference to the Facade at construction time</item>
-        ///     </list>
-        ///     <para>If you don't want to initialize a different <c>IModel</c>, call <c>base.initializeModel()</c> at the beginning of your method, then register <c>Proxy</c>s</para>
-        ///     <para>Note: This method is <i>rarely</i> overridden; in practice you are more likely to use a <c>Command</c> to create and register <c>Proxy</c>s with the <c>Model</c>, since <c>Proxy</c>s with mutable data will likely need to send <c>INotification</c>s and thus will likely want to fetch a reference to the <c>Facade</c> during their construction</para>
-        /// </remarks>
         protected virtual void InitializeModel()
         {
-			if (m_model != null) return;
-			m_model = Model.Instance;
-		}
 		
-        /// <summary>
-        /// Initialize the <c>View</c>
-        /// </summary>
-        /// <remarks>
-        ///     <para>Called by the <c>initializeFacade</c> method. Override this method in your subclass of <c>Facade</c> if one or both of the following are true:</para>
-        ///     <list type="bullet">
-        ///         <item>You wish to initialize a different <c>IView</c></item>
-        ///         <item>You have <c>Observers</c> to register with the <c>View</c></item>
-        ///     </list>
-        ///     <para>If you don't want to initialize a different <c>IView</c>, call <c>base.initializeView()</c> at the beginning of your method, then register <c>IMediator</c> instances</para>
-        ///     <para>Note: This method is <i>rarely</i> overridden; in practice you are more likely to use a <c>Command</c> to create and register <c>Mediator</c>s with the <c>View</c>, since <c>IMediator</c> instances will need to send <c>INotification</c>s and thus will likely want to fetch a reference to the <c>Facade</c> during their construction</para>
-        /// </remarks>
+			
+		}
+        
         protected virtual void InitializeView()
         {
-			if (m_view != null) return;
-			m_view = View.Instance;
+		
 		}
 
-		#endregion
 
-		#region Members
-
-		/// <summary>
-        /// Private reference to the Controller
-        /// </summary>
-		protected IController m_controller;
-
-        /// <summary>
-        /// Private reference to the Model
-        /// </summary>
-        protected IModel m_model;
-
-        /// <summary>
-        /// Private reference to the View
-        /// </summary>
-        protected IView m_view;
-
-        /// <summary>
-        /// The Singleton Facade Instance
-        /// </summary>
-        protected static volatile IFacade m_instance;
-
-		/// <summary>
-		/// Used for locking the instance calls
-		/// </summary>
-		protected static readonly object m_staticSyncRoot = new object();
-
-		#endregion
 
 
         //SimpleFramework Code By Jarjin lee
@@ -574,5 +435,59 @@ namespace PureMVC.Patterns
             }
             m_Managers.Remove(typeName);
         }
-	}
+        
+        public void RegisterObserver(NotifyDefine notifi, IObserver observer)
+        {
+            m_notifier.RegisterObserver(notifi, observer);
+        }
+
+        public void RemoveObserver(NotifyDefine notifi, IObserver observer)
+        {
+            m_notifier.RemoveObserver(notifi, observer);
+        }
+
+        public void NotifyObservers<SendEntity, Param>(INotification<SendEntity, Param> note)
+        {
+            m_notifier.NotifyObservers(note);
+        }
+
+        public void SendNotification(NotifyDefine notifi)
+        {
+            m_notifier.SendNotification(notifi);
+        }
+
+        public void SendNotification<Param>(NotifyDefine notifiid, Param body)
+        {
+            m_notifier.SendNotification(notifiid, body);
+        }
+
+        public void SendNotification<SendEntity, Param>(NotifyDefine notifiid, SendEntity send, Param body)
+        {
+            m_notifier.SendNotification(notifiid, send, body);
+        }
+        public void RemoveCommand(NotifyDefine notiid)
+        {
+            m_controller.RemoveCommand(notiid);
+        }
+
+        public bool HasCommand(NotifyDefine notiid)
+        {
+            return m_controller.HasCommand(notiid);
+        }
+
+        public void ExcuteCmd<SendEntity, Param>(INotification<SendEntity, Param> note)
+        {
+            m_controller.ExcuteCmd(note);
+        }
+
+        public ICommand GetCommand(NotifyDefine notifyid)
+        {
+            return m_controller.GetCommand(notifyid);
+        }
+
+        public void RegisterCommand(NotifyDefine notiid, ICommand command)
+        {
+            m_controller.RegisterCommand(notiid, command);
+        }
+    }
 }

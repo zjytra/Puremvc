@@ -20,7 +20,7 @@ namespace PureMVC.Patterns
     /// A base <c>IMediator</c> implementation
     /// </summary>
     /// <see cref="PureMVC.Core.View"/>
-    public class Mediator : Notifier, IMediator, INotifier
+    public class Mediator :GetFacade, IMediator,IObserver
 	{
 		#region Constants
 
@@ -74,23 +74,11 @@ namespace PureMVC.Patterns
 		/// List the <c>INotification</c> names this <c>Mediator</c> is interested in being notified of
 		/// </summary>
 		/// <returns>The list of <c>INotification</c> names </returns>
-		public virtual IList<string> ListNotificationInterests()
+		public virtual IList<NotifyDefine> ListNotificationInterests()
 		{
-			return new List<string>();
+			return new List<NotifyDefine>();
 		}
 
-		/// <summary>
-		/// Handle <c>INotification</c>s
-		/// </summary>
-		/// <param name="notification">The <c>INotification</c> instance to handle</param>
-		/// <remarks>
-		///     <para>
-		///        Typically this will be handled in a switch statement, with one 'case' entry per <c>INotification</c> the <c>Mediator</c> is interested in. 
-		///     </para>
-		/// </remarks>
-		public virtual void HandleNotification(INotification notification)
-		{
-		}
 
 		/// <summary>
 		/// Called by the View when the Mediator is registered
@@ -107,17 +95,26 @@ namespace PureMVC.Patterns
 		{
 		}
 
-		#endregion
 
-		#endregion
+        public virtual void HandleNotify<SendEntity, Param>(INotification<SendEntity, Param> notification) {
+        }
 
-		#region Accessors
+        public void OnNotify<SendEntity, Param>( INotification<SendEntity, Param> notification)
+        {
+            HandleNotify(notification);
+        }
 
-		/// <summary>
+        #endregion
+
+        #endregion
+
+        #region Accessors
+
+        /// <summary>
         /// The name of the <c>Mediator</c>
         /// </summary>
         /// <remarks><para>You should override this in your subclass</para></remarks>
-		public virtual string MediatorName
+        public virtual string MediatorName
 		{
 			get { return m_mediatorName; }
 		}
@@ -155,6 +152,6 @@ namespace PureMVC.Patterns
         /// </summary>
         protected object m_viewComponent;
 
-		#endregion
-	}
+        #endregion
+    }
 }

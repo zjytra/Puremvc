@@ -21,6 +21,6 @@ namespace PureMVC.Interfaces
         /// Execute the <c>ICommand</c>'s logic to handle a given <c>INotification</c>
         /// </summary>
         /// <param name="notification">An <c>INotification</c> to handle</param>
-		void Execute(INotification notification);
+		void Execute<SendEntity, Param>(INotification<SendEntity, Param> note);
     }
 }

@@ -35,7 +35,7 @@ public class MainPanelMediator : PureMVC.Patterns.Mediator {
     public void OnClickPlay () {
         Debug.Log ("start game");
         //为了测试功能，使用command方式实现
-        SendNotification (MyFacade.PLAY);
+       Facade. SendNotification (NotifyDefine.Notify_Play);
     }
 
     // public void DestroyAll () {
@@ -52,9 +52,10 @@ public class MainPanelMediator : PureMVC.Patterns.Mediator {
     /// 监听消息
     /// </summary>
     /// <param name="notification"></param>
-    public override void HandleNotification (INotification notification) {
-        switch (notification.Name) {
-            case MyFacade.REFRESH_BONUS_UI:
+    public override void HandleNotify<SendEntity, Param>(INotification<SendEntity, Param> notification)
+    {
+        switch (notification.NotifiId) {
+            case NotifyDefine.Notify_refresh_bonus_ui:
                 //此处业务逻辑可以放在Command中实现，Mediator的功能尽量简单
                 Debug.Log ("REFRESH_BONUS_UI");
 
@@ -63,14 +64,14 @@ public class MainPanelMediator : PureMVC.Patterns.Mediator {
                     View.gameObject.SetActive (true);
                 }
                 break;
-            case MyFacade.UPDATE_PLAYER_DATA:
+            case NotifyDefine.Notify_Update_Player_Data:
                 {
                     //更新UI
                     if (playerData != null) {
                         View.GamePlayCount.text = string.Format ("游戏次数:{0}", playerData.PlayerData.PlayGameCount);
                         View.RewardTotal.text = string.Format ("游戏总奖励:{0}", playerData.PlayerData.RewardTotal);
                         //show reward tip view
-                        SendNotification (MyFacade.REWARD_TIP_VIEW, notification.Body);
+                       Facade.SendNotification (NotifyDefine.Notify_RewardTipView, notification.Body);
 
                     }
 
@@ -109,9 +110,8 @@ public class MainPanelMediator : PureMVC.Patterns.Mediator {
     /// 不可以为Null，否则无法注册
     /// </summary>
     /// <returns></returns>
-    public override IList<string> ListNotificationInterests () {
-        IList<string> list = new List<string> () { MyFacade.REFRESH_BONUS_UI, MyFacade.UPDATE_PLAYER_DATA };
-
+    public override IList<NotifyDefine> ListNotificationInterests () {
+        IList<NotifyDefine> list = new List<NotifyDefine> () { NotifyDefine.Notify_refresh_bonus_ui, NotifyDefine.Notify_Update_Player_Data };
         return list;
     }
 

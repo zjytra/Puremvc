@@ -1,21 +1,14 @@
-﻿/* 
- PureMVC C# Port by Andy Adamczak <andy.adamczak@puremvc.org>, et al.
- PureMVC - Copyright(c) 2006-08 Futurescale, Inc., Some rights reserved. 
- Your reuse is governed by the Creative Commons Attribution 3.0 License 
-*/
-
-#region Using
-
-
-using System;
-
+﻿using System;
+using System.Collections.Generic;
+using PureMVC.Core;
 using PureMVC.Interfaces;
 using PureMVC.Patterns;
-
-#endregion
+using Unity.Collections;
 
 namespace PureMVC.Patterns
 {
+
+    // 通知观察者的类
     /// <summary>
     /// A Base <c>INotifier</c> implementation
     /// </summary>
@@ -31,72 +24,156 @@ namespace PureMVC.Patterns
 	/// <see cref="PureMVC.Patterns.MacroCommand"/>
     public class Notifier : INotifier
     {
-		#region Public Methods
 
-		#region INotifier Members
+        protected static INotifier m_instance;
+        public static INotifier Instance
+        {
+            get
+            {
+                if (m_instance == null)
+                {
+                    lock (m_staticSyncRoot)
+                    {
+                        if (m_instance == null)
+                            m_instance = new Notifier();
+                    }
+                }
+                return m_instance;
+            }
+        }
 
-		/// <summary>
-        /// Send an <c>INotification</c>
-        /// </summary>
-        /// <param name="notificationName">The name of the notiification to send</param>
-        /// <remarks>Keeps us from having to construct new notification instances in our implementation code</remarks>
-		/// <remarks>This method is thread safe</remarks>
-		public virtual void SendNotification(string notificationName) 
-		{
-			// The Facade SendNotification is thread safe, therefore this method is thread safe.
-			m_facade.SendNotification(notificationName);
-		}
+        protected Notifier()
+        {
+            m_notifiMap = new Dictionary<NotifyDefine, List<IObserver>>();
+        }
+
+        static Notifier()
+        {
+           
+        }
 
         /// <summary>
-        /// Send an <c>INotification</c>
+        ///  添加观察者
         /// </summary>
-        /// <param name="notificationName">The name of the notification to send</param>
-        /// <param name="body">The body of the notification</param>
-        /// <remarks>Keeps us from having to construct new notification instances in our implementation code</remarks>
-		/// <remarks>This method is thread safe</remarks>
-		public virtual void SendNotification(string notificationName, object body)
-		{
-			// The Facade SendNotification is thread safe, therefore this method is thread safe.
-			m_facade.SendNotification(notificationName, body);
-		}
+        /// <param name="notifi"></param>
+        /// <param name="observer"></param>
+        public virtual void RegisterObserver(NotifyDefine notifi, IObserver observer)
+        {
+            lock (m_syncRoot)
+            {
+                if (!m_notifiMap.ContainsKey(notifi))
+                {
+                    m_notifiMap[notifi] = new List<IObserver>();
+                }
+
+                m_notifiMap[notifi].Add(observer);
+            }
+        }
 
         /// <summary>
-        /// Send an <c>INotification</c>
+        /// 移除观察者
         /// </summary>
-        /// <param name="notificationName">The name of the notification to send</param>
-        /// <param name="body">The body of the notification</param>
-        /// <param name="type">The type of the notification</param>
-        /// <remarks>Keeps us from having to construct new notification instances in our implementation code</remarks>
-		/// <remarks>This method is thread safe</remarks>
-		public virtual void SendNotification(string notificationName, object body, string type)
-		{
-			// The Facade SendNotification is thread safe, therefore this method is thread safe.
-            m_facade.SendNotification(notificationName, body, type);
-		}
+        /// <param name="notifyid"></param>
+        /// <param name="observer"></param>
+        public virtual void RemoveObserver(NotifyDefine notifyid, IObserver observer)
+        {
+            lock (m_syncRoot)
+            {
+                if (!m_notifiMap.ContainsKey(notifyid))
+                {
+                    return;
+                }
 
-		#endregion
+                IList<IObserver> observers = m_notifiMap[notifyid];
+                // find the observer for the notifyContext
+                for (int i = 0; i < observers.Count; i++)
+                {
+                    if (observers[i].Equals(observer))
+                    {
+                        observers.RemoveAt(i);
+                        break;
+                    }
+                }
+                
+                if (observers.Count == 0)
+                {
+                    m_notifiMap.Remove(notifyid);
+                }
 
-		#endregion
+            }
+        }
 
-		#region Accessors
+        public virtual void NotifyObservers<SendEntity, Param>(INotification<SendEntity, Param> note)
+        {
+            IList<IObserver> observers = null;
 
-		/// <summary>
-		/// Local reference to the Facade Singleton
-		/// </summary>
-		protected IFacade Facade
-		{
-			get { return m_facade; }
-		}
+            lock (m_syncRoot)
+            {
+                if (m_notifiMap.ContainsKey(note.NotifiId))
+                {
+                    // Get a reference to the observers list for this notification name
+                    IList<IObserver> observers_ref = m_notifiMap[note.NotifiId];
+                    // Copy observers from reference array to working array, 
+                    // since the reference array may change during the notification loop
+                    observers = new List<IObserver>(observers_ref);
+                }
+            }
 
-		#endregion
+            // Notify outside of the lock
+            if (observers != null)
+            {
+                // Notify Observers from the working array				
+                for (int i = 0; i < observers.Count; i++)
+                {
+                    IObserver observer = observers[i];
+                    observer.OnNotify(note);
+                }
+            }
+            //查看命令里面是否有这个
+            Facade.Instance.ExcuteCmd(note);
+        }
 
-		#region Members
+        public void SendNotification(NotifyDefine notifiid)
+        {
+            Notification<object, object> notification = Notification<object, object>.createObject();
+            notification.NotifiId = notifiid;
+            notification.Body = null;
+            notification.Send = null;
+            NotifyObservers(notification);
+        }
 
-		/// <summary>
+        public void SendNotification<Param>(NotifyDefine notifiid, Param body)
+        {
+            Notification<object, Param> notification = Notification<object, Param>.createObject();
+            notification.NotifiId = notifiid;
+            notification.Body = body;
+            notification.Send = null;
+            NotifyObservers(notification);
+        }
+
+        public void SendNotification<SendEntity, Param>(NotifyDefine notifiid, SendEntity send, Param body)
+        {
+
+            Notification<SendEntity, Param> notification = Notification<SendEntity, Param>.createObject();
+            notification.NotifiId = notifiid;
+            notification.Body = body;
+            notification.Send = send;
+            NotifyObservers(notification);
+        }
+
+        #region Accessors
+
+        /// <summary>
         /// Local reference to the Facade Singleton
         /// </summary>
-		private IFacade m_facade = PureMVC.Patterns.Facade.Instance;
 
-		#endregion
-	}
+        private Dictionary<NotifyDefine,List<IObserver>> m_notifiMap;
+
+        protected readonly object m_syncRoot = new object();
+        /// <summary>
+        /// Used for locking the instance calls
+        /// </summary>
+        protected static readonly object m_staticSyncRoot = new object();
+        #endregion
+    }
 }

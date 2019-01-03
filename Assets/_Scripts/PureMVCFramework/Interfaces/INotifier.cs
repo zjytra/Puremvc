@@ -7,6 +7,7 @@
 #region Using
 
 using System;
+using Unity.Collections;
 
 #endregion
 
@@ -24,34 +25,17 @@ namespace PureMVC.Interfaces
 	/// <see cref="PureMVC.Interfaces.INotification"/>
     public interface INotifier
     {
-        /// <summary>
-        /// Send a <c>INotification</c>
-        /// </summary>
-        /// <remarks>
-        ///     <para>Convenience method to prevent having to construct new notification instances in our implementation code</para>
-        /// </remarks>
-        /// <param name="notificationName">The name of the notification to send</param>
-		void SendNotification(string notificationName);
 
-        /// <summary>
-        /// Send a <c>INotification</c>
-        /// </summary>
-        /// <remarks>
-        ///     <para>Convenience method to prevent having to construct new notification instances in our implementation code</para>
-        /// </remarks>
-        /// <param name="notificationName">The name of the notification to send</param>
-        /// <param name="body">The body of the notification</param>
-		void SendNotification(string notificationName, object body);
+        void RegisterObserver(NotifyDefine notifi, IObserver observer);
 
+        void RemoveObserver(NotifyDefine notifi, IObserver observer);
+		void NotifyObservers<SendEntity, Param>( INotification<SendEntity, Param> note);
         /// <summary>
-        /// Send a <c>INotification</c>
+        ///  //发送 给观察者或命令
         /// </summary>
-        /// <remarks>
-        ///     <para>Convenience method to prevent having to construct new notification instances in our implementation code</para>
-        /// </remarks>
-        /// <param name="notificationName">The name of the notification to send</param>
-        /// <param name="body">The body of the notification</param>
-        /// <param name="type">The type of the notification</param>
-		void SendNotification(string notificationName, object body, string type);
+        /// <param name="notifi"></param>
+		void SendNotification(NotifyDefine notifi); 
+        void SendNotification<Param>(NotifyDefine notifiid, Param body);
+		void SendNotification<SendEntity, Param>(NotifyDefine notifiid, SendEntity send, Param body);
     }
 }

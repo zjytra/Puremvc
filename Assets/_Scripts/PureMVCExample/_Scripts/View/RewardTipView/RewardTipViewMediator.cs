@@ -29,7 +29,7 @@ public class RewardTipViewMediator:PureMVC.Patterns.Mediator
 		View.gameObject.SetActive (false);
 
 		  //重新随机奖励列表
-		SendNotification(MyFacade.REFRESH_BONUS_ITEMS);
+		Facade.SendNotification(NotifyDefine.Notify_refresh_bonus_items);
 	}
 		
 	/// <summary>
@@ -37,32 +37,33 @@ public class RewardTipViewMediator:PureMVC.Patterns.Mediator
 	/// 不可以为Null，否则无法注册
 	/// </summary>
 	/// <returns></returns>
-	public override IList<string> ListNotificationInterests()
+	public override IList<NotifyDefine> ListNotificationInterests()
 	{
-		IList<string> list = new List<string>()
-		{ MyFacade.UPDATE_REWARD_TIP_VIEW};
+		IList<NotifyDefine> list = new List<NotifyDefine>()
+		{ NotifyDefine.Notify_RewardTipView};
 
 		return list;
 	}
 
-	/// <summary>
-	/// 监听消息
-	/// </summary>
-	/// <param name="notification"></param>
-	public override void HandleNotification(INotification notification)
-	{
-		switch (notification.Name)
-		{
-		case MyFacade.UPDATE_REWARD_TIP_VIEW:
-			if (!View.isActiveAndEnabled) {
-				View.gameObject.SetActive (true);
-			}
-			string text = notification.Body as string;
-			//update text
-			View.SetText (text);
+    /// <summary>
+    /// 监听消息
+    /// </summary>
+    /// <param name="notification"></param>
+    public override void HandleNotify<SendEntity, Param>(INotification<SendEntity, Param> notification)
+    {
+        switch (notification.NotifiId)
+        {
+            case NotifyDefine.Notify_RewardTipView:
+                if (!View.isActiveAndEnabled)
+                {
+                    View.gameObject.SetActive(true);
+                }
+                string text = notification.Body as string;
+                //update text
+                View.SetText(text);
 
-			break;
-		}
-	}
+                break;
+        }
+    }
 
 }

@@ -71,6 +71,7 @@
     <Compile Include="Assets\_Scripts\PureMVCExample\_Scripts\Model\PlayerDataModel.cs" />
     <Compile Include="Assets\_Scripts\PureMVCExample\_Scripts\Model\PlayerDataProxy.cs" />
     <Compile Include="Assets\_Scripts\PureMVCExample\_Scripts\MyFacade.cs" />
+    <Compile Include="Assets\_Scripts\PureMVCExample\_Scripts\NoticiDefine.cs" />
     <Compile Include="Assets\_Scripts\PureMVCExample\_Scripts\Utility\GameObjectUtility.cs" />
     <Compile Include="Assets\_Scripts\PureMVCExample\_Scripts\View\MainPanelView\BonusIem.cs" />
     <Compile Include="Assets\_Scripts\PureMVCExample\_Scripts\View\MainPanelView\MainPanelMediator.cs" />
@@ -93,7 +94,9 @@
     <Compile Include="Assets\_Scripts\PureMVCFramework\Patterns\Command\MacroCommand.cs" />
     <Compile Include="Assets\_Scripts\PureMVCFramework\Patterns\Command\SimpleCommand.cs" />
     <Compile Include="Assets\_Scripts\PureMVCFramework\Patterns\Facade\Facade.cs" />
+    <Compile Include="Assets\_Scripts\PureMVCFramework\Patterns\Facade\GetFacade.cs" />
     <Compile Include="Assets\_Scripts\PureMVCFramework\Patterns\Mediator\Mediator.cs" />
+    <Compile Include="Assets\_Scripts\PureMVCFramework\Patterns\ObjPool\ObjPools.cs" />
     <Compile Include="Assets\_Scripts\PureMVCFramework\Patterns\Observer\Notification.cs" />
     <Compile Include="Assets\_Scripts\PureMVCFramework\Patterns\Observer\Notifier.cs" />
     <Compile Include="Assets\_Scripts\PureMVCFramework\Patterns\Observer\Observer.cs" />

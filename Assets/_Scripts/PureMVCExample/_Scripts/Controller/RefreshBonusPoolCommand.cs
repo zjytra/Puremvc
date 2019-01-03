@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class RefreshRewardPoolCommand : PureMVC.Patterns.SimpleCommand {
 
-	public override void Execute (INotification notification) {
+	public override void Execute<SendEntity, Param>(INotification<SendEntity, Param> note)
+    {
 		//生成随机奖励
 		//获取Proxy，可以定义出来，不需要每次都获取
 		BonusProxy bonus = Facade.RetrieveProxy (BonusProxy.NAME) as BonusProxy;
@@ -44,7 +45,7 @@ public class RefreshRewardPoolCommand : PureMVC.Patterns.SimpleCommand {
 			}
 
 			//更新UI，并显示MainPanelView面板
-			SendNotification (MyFacade.REFRESH_BONUS_UI);
+			Facade.SendNotification (NotifyDefine.Notify_refresh_bonus_ui);
 
 			Debug.Log ("==============RefreshRewardPoolCommand done");
 		}

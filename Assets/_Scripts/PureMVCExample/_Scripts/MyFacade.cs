@@ -33,7 +33,10 @@ public class MyFacade : PureMVC.Patterns.Facade {
     /// 静态初始化 
     /// </summary>
     static MyFacade () {
-        m_instance = new MyFacade ();
+        if (m_instance == null)
+        {
+            m_instance = new MyFacade();
+        }
     }
 
     /// <summary>
@@ -49,19 +52,18 @@ public class MyFacade : PureMVC.Patterns.Facade {
     /// </summary>
     public void Launch () {
         //通过command命令启动游戏
-        SendNotification (MyFacade.START_UP);
+        SendNotification (NotifyDefine.Notify_Startup);
     }
 
     /// <summary>
     /// 初始化Controller，完成Notification和Command的映射
     /// </summary>
     protected override void InitializeController () {
-        base.InitializeController ();
         //注册Command
-        RegisterCommand (START_UP, typeof (StartUpCommand));
-        RegisterCommand (REFRESH_BONUS_ITEMS, typeof (RefreshRewardPoolCommand));
-        RegisterCommand (PLAY, typeof (PlayCommand));
-        RegisterCommand (REWARD_TIP_VIEW, typeof (RewardTipCommand));
+        RegisterCommand (NotifyDefine.Notify_Startup, new  StartUpCommand());
+        RegisterCommand (NotifyDefine.Notify_refresh_bonus_items, new RefreshRewardPoolCommand());
+        RegisterCommand (NotifyDefine.Notify_Play, new PlayCommand());
+        RegisterCommand (NotifyDefine.Notify_RewardTipView, new RewardTipCommand());
     }
 
     /// <summary>

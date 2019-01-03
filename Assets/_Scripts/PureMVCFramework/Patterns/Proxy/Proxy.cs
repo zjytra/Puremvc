@@ -24,7 +24,7 @@ namespace PureMVC.Patterns
     /// 	<para><c>Proxy</c> classes are also used to encapsulate the application's interaction with remote services to save or retrieve data, in which case, we adopt an asyncronous idiom; setting data (or calling a method) on the <c>Proxy</c> and listening for a <c>Notification</c> to be sent when the <c>Proxy</c> has retrieved the data from the service</para>
     /// </remarks>
 	/// <see cref="PureMVC.Core.Model"/>
-    public class Proxy : Notifier, IProxy, INotifier
+    public class Proxy :GetFacade,  IProxy
     {
 		#region Constants
 
@@ -124,6 +124,6 @@ namespace PureMVC.Patterns
 		/// </summary>
 		protected object m_data;
 
-		#endregion
-	}
+        #endregion
+    }
 }

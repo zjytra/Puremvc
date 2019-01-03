@@ -18,9 +18,9 @@ public class PlayerDataProxy : PureMVC.Patterns.Proxy {
     {
         PlayerData.PlayGameCount++;
         PlayerData.RewardTotal += reward;
-	
+
         //发送消息 更新MainPanelView UI组件 通知订阅者
-		SendNotification(MyFacade.UPDATE_PLAYER_DATA,info+reward);
+        Facade.SendNotification(NotifyDefine.Notify_Update_Player_Data, info+reward);
     }
 
 

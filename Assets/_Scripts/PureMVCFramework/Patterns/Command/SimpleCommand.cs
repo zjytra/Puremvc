@@ -25,7 +25,7 @@ namespace PureMVC.Patterns
 	/// <see cref="PureMVC.Core.Controller"/>
 	/// <see cref="PureMVC.Patterns.Notification"/>
 	/// <see cref="PureMVC.Patterns.MacroCommand"/>
-    public class SimpleCommand : Notifier, ICommand, INotifier
+    public class SimpleCommand:GetFacade, ICommand
     {
 		#region Public Methods
 
@@ -38,12 +38,15 @@ namespace PureMVC.Patterns
         /// <remarks>
         ///     <para>In the Command Pattern, an application use-case typically begins with some user action, which results in an <c>INotification</c> being broadcast, which is handled by business logic in the <c>execute</c> method of an <c>ICommand</c></para>
         /// </remarks>
-		public virtual void Execute(INotification notification)
-		{
-		}
 
-		#endregion
+        public virtual void Execute<SendEntity, Param>(INotification<SendEntity, Param> note)
+        {
 
-		#endregion
-	}
+        }
+
+        #endregion
+
+        #endregion
+
+    }
 }

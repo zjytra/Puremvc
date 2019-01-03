@@ -3,6 +3,7 @@
  PureMVC - Copyright(c) 2006-08 Futurescale, Inc., Some rights reserved. 
  Your reuse is governed by the Creative Commons Attribution 3.0 License 
 */
+using PureMVC.Patterns;
 using System;
 
 namespace PureMVC.Interfaces
@@ -27,29 +28,6 @@ namespace PureMVC.Interfaces
     public interface IView
 	{
 		#region Observer
-
-		/// <summary>
-        /// Register an <c>IObserver</c> to be notified of <c>INotifications</c> with a given name
-        /// </summary>
-        /// <param name="notificationName">The name of the <c>INotifications</c> to notify this <c>IObserver</c> of</param>
-        /// <param name="observer">The <c>IObserver</c> to register</param>
-		void RegisterObserver(string notificationName, IObserver observer);
-
-		/// <summary>
-		/// Remove a group of observers from the observer list for a given Notification name.
-		/// </summary>
-		/// <param name="notificationName">which observer list to remove from</param>
-		/// <param name="notifyContext">removed the observers with this object as their notifyContext</param>
-		void RemoveObserver(string notificationName, object notifyContext);
-
-        /// <summary>
-        /// Notify the <c>IObservers</c> for a particular <c>INotification</c>
-        /// </summary>
-        /// <param name="note">The <c>INotification</c> to notify <c>IObservers</c> of</param>
-        /// <remarks>
-        ///     <para>All previously attached <c>IObservers</c> for this <c>INotification</c>'s list are notified and are passed a reference to the <c>INotification</c> in the order in which they were registered</para>
-        /// </remarks>
-		void NotifyObservers(INotification note);
 
 		#endregion
 

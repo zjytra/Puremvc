@@ -27,7 +27,7 @@ namespace PureMVC.Patterns
 	/// <see cref="PureMVC.Core.Controller"/>
 	/// <see cref="PureMVC.Patterns.Notification"/>
 	/// <see cref="PureMVC.Patterns.SimpleCommand"/>
-    public class MacroCommand : Notifier, ICommand, INotifier
+    public class MacroCommand : GetFacade, ICommand
 	{
 		#region Constructors
 
@@ -40,7 +40,7 @@ namespace PureMVC.Patterns
         /// </remarks>
 		public MacroCommand()
 		{
-			m_subCommands = new List<Type>();
+			m_subCommands = new List<ICommand>();
 			InitializeMacroCommand();
 		}
 
@@ -57,20 +57,17 @@ namespace PureMVC.Patterns
 		/// <remarks>
 		///     <para>The <i>SubCommands</i> will be called in First In/First Out (FIFO) order</para>
 		/// </remarks>
-		public virtual void Execute(INotification notification)
-		{
-			while (m_subCommands.Count > 0)
-			{
-				Type commandType = m_subCommands[0];
-				object commandInstance = Activator.CreateInstance(commandType);
-
-				if (commandInstance is ICommand)
-				{
-					((ICommand) commandInstance).Execute(notification);
-				}
-
-				m_subCommands.RemoveAt(0);
-			}
+		public virtual void Execute<SendEntity, Param>(INotification<SendEntity, Param> note)
+        {
+            for (int i = 0; i < m_subCommands.Count; i++)
+            {
+                ICommand command = m_subCommands[i];
+                if (command != null)
+                {
+                    command.Execute(note);
+                }
+            }
+		
 		}
 
 		#endregion
@@ -108,17 +105,16 @@ namespace PureMVC.Patterns
         /// <remarks>
         ///     <para>The <i>SubCommands</i> will be called in First In/First Out (FIFO) order</para>
         /// </remarks>
-        protected void AddSubCommand(Type commandType)
+        protected void AddSubCommand(ICommand commandType)
 		{
             m_subCommands.Add(commandType);
 		}
+        #endregion
 
-		#endregion
+        #region Members
 
-		#region Members
+        private IList<ICommand> m_subCommands;
 
-		private IList<Type> m_subCommands;
-
-		#endregion
-	}
+        #endregion
+    }
 }

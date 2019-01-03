@@ -100,18 +100,13 @@ namespace PureMVC.Interfaces
         /// List <c>INotification interests</c>
         /// </summary>
         /// <returns>An <c>IList</c> of the <c>INotification</c> names this <c>IMediator</c> has an interest in</returns>
-        IList<string> ListNotificationInterests();
-		
+        IList<NotifyDefine> ListNotificationInterests();
+        //处理监听的消息
+        void HandleNotify<SendEntity, Param>(INotification<SendEntity, Param> notification);
         /// <summary>
-        /// Handle an <c>INotification</c>
+        /// Called by the View when the Mediator is registered
         /// </summary>
-        /// <param name="notification">The <c>INotification</c> to be handled</param>
-		void HandleNotification(INotification notification);
-		
-		/// <summary>
-		/// Called by the View when the Mediator is registered
-		/// </summary>
-		void OnRegister();
+        void OnRegister();
 
 		/// <summary>
 		/// Called by the View when the Mediator is removed

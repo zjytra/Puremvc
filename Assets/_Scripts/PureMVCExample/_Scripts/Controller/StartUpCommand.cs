@@ -9,14 +9,15 @@ using UnityEngine;
 /// </summary>
 public class StartUpCommand : PureMVC.Patterns.SimpleCommand {
 
-	public override void Execute (INotification notification) {
+	public override void Execute<SendEntity, Param>(INotification<SendEntity, Param> note)
+    {
 		//create ui
 		GameObject obj = GameObjectUtility.Instance.CreateGameObject ("_Prefabs/MainPanelView");
 		//bind mediator
 		Facade.RegisterMediator (new MainPanelMediator (obj));
 
-		//更新12个道具
-		SendNotification (MyFacade.REFRESH_BONUS_ITEMS);
+        //更新12个道具
+        Facade.SendNotification (NotifyDefine.Notify_refresh_bonus_items);
 
 	}
 }
