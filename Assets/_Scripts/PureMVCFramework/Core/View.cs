@@ -33,7 +33,7 @@ namespace PureMVC.Core
 	/// <see cref="PureMVC.Patterns.Mediator"/>
 	/// <see cref="PureMVC.Patterns.Observer"/>
 	/// <see cref="PureMVC.Patterns.Notification"/>
-    public class View : IView
+    public class View : IView,ILife
     {
 		#region Constructors
 
@@ -46,8 +46,8 @@ namespace PureMVC.Core
 		protected View()
 		{
 			m_mediatorMap = new Dictionary<string, IMediator>();
-            InitializeView();
-		}
+            InitMe();
+        }
 
 		#endregion
 		/// <summary>
@@ -125,7 +125,7 @@ namespace PureMVC.Core
 				{
 					// remove the observer linking the mediator 
 					// to the notification interest
-				   Notifier.Instance.RemoveObserver(interests[i], mediator);
+				   Facade.Instance.RemoveObserver(interests[i], mediator);
 				}
 
 				// remove the mediator from the map		
@@ -155,14 +155,10 @@ namespace PureMVC.Core
 		/// <summary>
 		/// View Singleton Factory method.  This method is thread safe.
 		/// </summary>
-		public static IView Instance
+		public static View Instance
 		{
 			get
 			{
-                if (m_instance == null)
-                {
-                    if (m_instance == null) m_instance = new View();
-                }
                 return m_instance;
 			}
 		}
@@ -176,7 +172,10 @@ namespace PureMVC.Core
         /// </summary>
         static View()
         {
-           
+            if (m_instance == null)
+            {
+                if (m_instance == null) m_instance = new View();
+            }
         }
 
         /// <summary>
@@ -189,18 +188,28 @@ namespace PureMVC.Core
 		{
 		}
 
-		#endregion
+        public virtual void InitMe()
+        {
+            InitializeView();
+        }
+
+        public void OverLife()
+        {
+            m_mediatorMap.Clear();
+        }
+
+        #endregion
 
 
-		/// <summary>
+        /// <summary>
         /// Mapping of Mediator names to Mediator instances
         /// </summary>
-		protected IDictionary<string, IMediator> m_mediatorMap;
+        protected IDictionary<string, IMediator> m_mediatorMap;
 	
         /// <summary>
         /// Singleton instance
         /// </summary>
-		protected static volatile IView m_instance;
+		protected static volatile View m_instance;
 
 		/// <summary>
 		/// Used for locking

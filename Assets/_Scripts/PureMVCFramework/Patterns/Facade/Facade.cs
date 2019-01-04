@@ -137,24 +137,24 @@ namespace PureMVC.Patterns
 	/// <see cref="PureMVC.Patterns.Proxy"/>
 	/// <see cref="PureMVC.Patterns.SimpleCommand"/>
 	/// <see cref="PureMVC.Patterns.MacroCommand"/>
-    public class Facade : IFacade,IController,INotifier
+    public class Facade : IFacade,IController,INotifier,ILife
 	{
         /// <summary>
         /// Private reference to the Controller
         /// </summary>
-        protected IController m_controller;
+        protected Controller m_controller;
         /// <summary>
         /// Private reference to the Model
         /// </summary>
-        protected IModel m_model;
+        protected Model m_model;
         /// <summary>
         /// Private reference to the View
         /// </summary>
-        protected IView m_view;
+        protected View m_view;
         /// <summary>
         /// 通知接口
         /// </summary>
-        protected INotifier m_notifier;
+        protected Notifier m_notifier;
         /// <summary>
         /// The Singleton Facade Instance
         /// </summary>
@@ -172,7 +172,8 @@ namespace PureMVC.Patterns
         /// </remarks>
         protected Facade() 
         {
-			InitializeFacade();
+            InitMe();
+		
 		}
 		#endregion
 
@@ -227,25 +228,20 @@ namespace PureMVC.Patterns
 			return m_model.HasProxy(proxyName);
 		}
 
-
-		/// <summary>
-		/// Register an <c>IMediator</c> instance with the <c>View</c>
-		/// </summary>
-		/// <param name="mediator">A reference to the <c>IMediator</c> instance</param>
-		/// <remarks>This method is thread safe and needs to be thread safe in all implementations.</remarks>
+        /// <summary>
+        /// mediator也作为一个观察者使用,监听的命令由mediator ListNotificationInterests()控制
+        /// </summary>
+        /// <param name="mediator"></param>
         public virtual void RegisterMediator(IMediator mediator)
 		{
-			// The view is initialized in the constructor of the singleton, so this call should be thread safe.
-			// This method is thread safe on the view.
 			m_view.RegisterMediator(mediator);
 		}
 
-		/// <summary>
-		/// Retrieve an <c>IMediator</c> instance from the <c>View</c>
-		/// </summary>
-		/// <param name="mediatorName">The name of the <c>IMediator</c> instance to retrieve</param>
-		/// <returns>The <c>IMediator</c> previously registered with the given <c>mediatorName</c></returns>
-		/// <remarks>This method is thread safe and needs to be thread safe in all implementations.</remarks>
+        /// <summary>
+        /// 获取mediator
+        /// </summary>
+        /// <param name="mediatorName"></param>
+        /// <returns></returns>
         public virtual IMediator RetrieveMediator(string mediatorName)
 		{
 			// The view is initialized in the constructor of the singleton, so this call should be thread safe.
@@ -305,7 +301,6 @@ namespace PureMVC.Patterns
         ///</summary>
         static Facade()
         {
-           
         }
 
 
@@ -320,12 +315,13 @@ namespace PureMVC.Patterns
             
             if (m_model == null)
                 m_model = Model.Instance;
+            if (m_notifier == null)
+                m_notifier = Notifier.Instance;
             if (m_controller == null)
                 m_controller = Controller.Instance;
             if (m_view == null) 
                 m_view = View.Instance;
-            if (m_notifier == null)
-                m_notifier = Notifier.Instance;
+          
 
 
             InitializeModel();
@@ -488,6 +484,19 @@ namespace PureMVC.Patterns
         public void RegisterCommand(NotifyDefine notiid, ICommand command)
         {
             m_controller.RegisterCommand(notiid, command);
+        }
+
+        public virtual void InitMe()
+        {
+            InitializeFacade();
+        }
+
+        public void OverLife()
+        {
+            m_model.OverLife();
+            m_view.OverLife();
+            m_controller.OverLife();
+            m_notifier.OverLife();
         }
     }
 }

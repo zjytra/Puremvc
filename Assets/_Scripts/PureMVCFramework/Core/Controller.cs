@@ -35,13 +35,13 @@ namespace PureMVC.Core
 	/// <see cref="PureMVC.Patterns.Notification"/>
 	/// <see cref="PureMVC.Patterns.SimpleCommand"/>
 	/// <see cref="PureMVC.Patterns.MacroCommand"/>
-    public class Controller : IController
+    public class Controller : IController,ILife
 	{
 		#region Constructors
 		protected Controller()
 		{
-			m_commandMap = new Dictionary<NotifyDefine, ICommand>();	
-			InitializeController();
+			m_commandMap = new Dictionary<NotifyDefine, ICommand>();
+            InitMe();
 		}
 		#endregion
 
@@ -97,17 +97,11 @@ namespace PureMVC.Core
 		/// <summary>
 		/// Singleton Factory method.  This method is thread safe.
 		/// </summary>
-		public static IController Instance
+		public static Controller Instance
 		{
 			get
 			{
-                if (m_instance == null)
-                {
-                    lock (m_staticSyncRoot)
-                    {
-                        if (m_instance == null) m_instance = new Controller();
-                    }
-                }
+              
                 return m_instance;
 			}
 		}
@@ -122,17 +116,33 @@ namespace PureMVC.Core
 		/// </summary>
 		static Controller()
 		{
-          
+            if (m_instance == null)
+            {
+                lock (m_staticSyncRoot)
+                {
+                    if (m_instance == null) m_instance = new Controller();
+                }
+            }
         }
 		protected virtual void InitializeController()
 		{
 		}
 
-		#endregion
+        public void InitMe()
+        {
+            InitializeController();
+        }
 
-		#region Members
+        public void OverLife()
+        {
+            m_commandMap.Clear();
+        }
 
-		
+        #endregion
+
+        #region Members
+
+
         /// <summary>
         /// Mapping of Notification names to Command Class references
         /// </summary>
@@ -141,7 +151,7 @@ namespace PureMVC.Core
         /// <summary>
         /// Singleton instance, can be sublcassed though....
         /// </summary>
-		protected static volatile IController m_instance;
+		protected static volatile Controller m_instance;
 
 		/// <summary>
 		/// Used for locking

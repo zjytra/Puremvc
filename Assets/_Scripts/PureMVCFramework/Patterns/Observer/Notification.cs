@@ -63,6 +63,18 @@ namespace PureMVC.Patterns
 			m_send = send;
 		}
 
+        /// <summary>
+        /// 初始化变量
+        /// </summary>
+        /// <param name="notifi"></param>
+        /// <param name="send"></param>
+        /// <param name="body"></param>
+        public void InitData(NotifyDefine notifi, SendEntity send, Param body)
+        {
+            m_notifi = notifi;
+            m_send = send;
+            m_body = body;
+        }
 		#endregion
 
 		#region Public Methods
@@ -127,14 +139,6 @@ namespace PureMVC.Patterns
             set
             {
                 m_send = value;
-            }
-        }
-
-        public NotifyDefine Notifyid
-        {
-            get
-            {
-                return m_notifi;
             }
         }
 

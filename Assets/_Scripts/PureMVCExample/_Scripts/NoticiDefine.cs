@@ -13,5 +13,6 @@ public enum NotifyDefine : uint
     Notify_CREATE_BONUS_ITEMS,
     Notify_UPDATE_REWARD_TIP_VIEW,
     Notify_RewardTipView,
+    Notify_Test = 10, // 测试消息
     Notify_Max = uint.MaxValue
 }

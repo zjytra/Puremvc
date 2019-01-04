@@ -33,9 +33,12 @@ public class MainPanelMediator : PureMVC.Patterns.Mediator {
     }
 
     public void OnClickPlay () {
-        Debug.Log ("start game");
+      
         //为了测试功能，使用command方式实现
-       Facade. SendNotification (NotifyDefine.Notify_Play);
+       Facade.SendNotification (NotifyDefine.Notify_Play);
+
+        //测试接口
+       Facade.SendNotification(NotifyDefine.Notify_Test);
     }
 
     // public void DestroyAll () {
@@ -77,6 +80,11 @@ public class MainPanelMediator : PureMVC.Patterns.Mediator {
 
                 }
                 break;
+            case NotifyDefine.Notify_Test:
+                {
+                    Debug.Log("__________________________MainPanelMediator test");
+                }
+                break;
         }
     }
 
@@ -111,7 +119,11 @@ public class MainPanelMediator : PureMVC.Patterns.Mediator {
     /// </summary>
     /// <returns></returns>
     public override IList<NotifyDefine> ListNotificationInterests () {
-        IList<NotifyDefine> list = new List<NotifyDefine> () { NotifyDefine.Notify_refresh_bonus_ui, NotifyDefine.Notify_Update_Player_Data };
+        IList<NotifyDefine> list = new List<NotifyDefine> () {
+            NotifyDefine.Notify_refresh_bonus_ui,
+            NotifyDefine.Notify_Update_Player_Data,
+            NotifyDefine.Notify_Test
+        };
         return list;
     }
 

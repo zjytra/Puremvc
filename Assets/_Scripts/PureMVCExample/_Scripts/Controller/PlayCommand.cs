@@ -9,13 +9,13 @@ public class PlayCommand : PureMVC.Patterns.SimpleCommand
      public override void Execute<SendEntity, Param>(INotification<SendEntity, Param> note)
         {
             //开始随机
-            BonusProxy bonus = MyFacade.GetInstance().RetrieveProxy(BonusProxy.NAME) as BonusProxy;
+            BonusProxy bonus = Facade.RetrieveProxy(BonusProxy.NAME) as BonusProxy;
             int id = Random.Range(0, bonus.BonusLists.Count);
 
             Debug.Log("result:"+bonus.BonusLists[id].Name+","+bonus.BonusLists[id].Reward);
 
             //改变数值 并发送消息
-		    PlayerDataProxy playerData = MyFacade.GetInstance().RetrieveProxy(PlayerDataProxy.NAME) as PlayerDataProxy;
+		    PlayerDataProxy playerData = Facade.RetrieveProxy(PlayerDataProxy.NAME) as PlayerDataProxy;
             if(playerData!=null)
             {
                 playerData.GetReward(bonus.BonusLists[id].Reward,bonus.BonusLists[id].Name);

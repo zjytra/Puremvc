@@ -64,6 +64,7 @@ public class MyFacade : PureMVC.Patterns.Facade {
         RegisterCommand (NotifyDefine.Notify_refresh_bonus_items, new RefreshRewardPoolCommand());
         RegisterCommand (NotifyDefine.Notify_Play, new PlayCommand());
         RegisterCommand (NotifyDefine.Notify_RewardTipView, new RewardTipCommand());
+        RegisterCommand(NotifyDefine.Notify_Test, new TestCommand());
     }
 
     /// <summary>

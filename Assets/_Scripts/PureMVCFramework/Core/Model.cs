@@ -34,7 +34,7 @@ namespace PureMVC.Core
     /// </remarks>
 	/// <seealso cref="PureMVC.Patterns.Proxy"/>
 	/// <seealso cref="PureMVC.Interfaces.IProxy" />
-    public class Model : IModel
+    public class Model : IModel,ILife
     {
 		#region Constructors
 
@@ -47,7 +47,7 @@ namespace PureMVC.Core
 		protected Model()
 		{
 			m_proxyMap = new Dictionary<string, IProxy>();
-			InitializeModel();
+            InitMe();
 		}
 
 		#endregion
@@ -131,11 +131,11 @@ namespace PureMVC.Core
 		/// <summary>
 		/// <c>Model</c> Singleton Factory method.  This method is thread safe.
 		/// </summary>
-		public static IModel Instance
+		public static Model Instance
 		{
 			get
 			{
-				return m_instance;
+                return m_instance;
 			}
 		}
 
@@ -167,19 +167,29 @@ namespace PureMVC.Core
 		{
 		}
 
-		#endregion
+        public virtual void InitMe()
+        {
+            InitializeModel();
+        }
 
-		#region Members
+        public void OverLife()
+        {
+            m_proxyMap.Clear();
+        }
 
-		/// <summary>
-		/// Mapping of proxyNames to <c>IProxy</c> instances
-		/// </summary>
-		protected IDictionary<string, IProxy> m_proxyMap;
+        #endregion
+
+        #region Members
+
+        /// <summary>
+        /// Mapping of proxyNames to <c>IProxy</c> instances
+        /// </summary>
+        protected IDictionary<string, IProxy> m_proxyMap;
 
 		/// <summary>
 		/// Singleton instance
 		/// </summary>
-		protected static volatile IModel m_instance;
+		protected static volatile Model m_instance;
 
 		/// <summary>
 		/// Used for locking

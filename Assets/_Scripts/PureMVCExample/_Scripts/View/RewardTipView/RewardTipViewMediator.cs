@@ -40,7 +40,10 @@ public class RewardTipViewMediator:PureMVC.Patterns.Mediator
 	public override IList<NotifyDefine> ListNotificationInterests()
 	{
 		IList<NotifyDefine> list = new List<NotifyDefine>()
-		{ NotifyDefine.Notify_RewardTipView};
+		{
+            NotifyDefine.Notify_RewardTipView,
+            NotifyDefine.Notify_Test
+        };
 
 		return list;
 	}
@@ -61,7 +64,10 @@ public class RewardTipViewMediator:PureMVC.Patterns.Mediator
                 string text = notification.Body as string;
                 //update text
                 View.SetText(text);
+                break;
 
+            case NotifyDefine.Notify_Test:
+                Debug.Log("RewardTipViewMediator ------------ test");
                 break;
         }
     }
